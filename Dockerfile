@@ -10,7 +10,8 @@ ADD playbook.yml requirements.yml /opt/setup/
 
 RUN yum -y install epel-release \
     && yum -y install ansible sudo \
-    && ansible-galaxy install -p /opt/setup/roles -r requirements.yml
+    && ansible-galaxy install -p /opt/setup/roles -r requirements.yml \
+    && yum clean all
 
 ARG OMERO_VERSION=5.6.1
 ARG OMEGO_ADDITIONAL_ARGS=
