@@ -64,6 +64,11 @@ Default volumes
 - `/opt/omero/server/OMERO.server/var`: The OMERO.server `var` directory, including logs
 - `/OMERO`: The OMERO data directory
 
+When using bind mounts, ensure that the ownership and permissions on the host are set as follows:
+
+- host folder mapped to `/opt/omero/server/OMERO.server/var`: UID/GID: 1000/997 `drwxr-xr-x`
+- host folder mapped to `/OMERO`: UID/GID: 1000/0 `drwxr-xr-x`
+
 
 Exposed ports
 -------------
