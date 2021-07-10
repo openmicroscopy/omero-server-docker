@@ -16,8 +16,19 @@ else
     DBHOST=db
     $omero config set omero.db.host "$DBHOST"
 fi
+
+CONFIG_omero_db_name=${CONFIG_omero_db_name:-}
+if [ -n "$CONFIG_omero_db_name" ]; then
+    DBNAME="$CONFIG_omero_db_name"
+    DBNAME_src=env
+else
+    # Delay setting in config until *after*
+    # the upgrade is attempted.
+    DBNAME=omero
+    DBNAME_src=default
+fi
+
 DBUSER="${CONFIG_omero_db_user:-omero}"
-DBNAME="${CONFIG_omero_db_name:-omero}"
 DBPASS="${CONFIG_omero_db_pass:-omero}"
 DBPORT="${CONFIG_omero_db_port:-5432}"
 ROOTPASS="${ROOTPASS:-omero}"
@@ -41,6 +52,11 @@ psql -w -h "$DBHOST" -p "$DBPORT" -U "$DBUSER" "$DBNAME" -c \
     echo "Upgrading database"
     $omego db upgrade --serverdir=OMERO.server
 } || {
+    if [ "$DBNAME_src" = default ]; then
+        $omero config set omero.db.name "$DBNAME"
+        # And set for restarts
+        echo config set omero.db.name \"$DBNAME\" > /opt/omero/server/config/60-database.omero
+    fi
     echo "Initialising database"
     $omego db init --rootpass "$ROOTPASS" --serverdir=OMERO.server
 }
